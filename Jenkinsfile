@@ -1,6 +1,6 @@
 #!/usr/bin/env groovy
 
-node {
+node('dotnet') {
   stage('compile') {
     checkout scm
     stash 'everything'
@@ -11,24 +11,26 @@ node {
   }
 }
 
-// stage('test') {
-//     parallel unitTests: {
-//       test('Test')
-//     }, integrationTests: {
-//       test('IntegrationTest')
-//     },
-//     failFast: false
-// }
+stage('test') {
+    parallel 
+    unitTests: {
+      test('Test')
+    }, 
+    integrationTests: {
+      test('IntegrationTest')
+    },
+    failFast: false
+}
 
-// def test(type) {
-//   node {
-//     unstash 'everything'
-//     dir("test/cafe.${type}") {
-//         bat 'dotnet restore'
-//         bat 'dotnet test'
-//     }
-//   }
-// }
+def test(type) {
+  node {
+    unstash 'everything'
+    dir("test/cafe.${type}") {
+        bat 'dotnet restore'
+        bat 'dotnet test'
+    }
+  }
+}
 
 stage('publish') {
   parallel windows: {
