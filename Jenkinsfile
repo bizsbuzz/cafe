@@ -9,17 +9,28 @@ node('dotnet') {
       bat "dotnet build --version-suffix ${env.BUILD_NUMBER}"
     }
   }
-}
 
-stage('test') {
-    parallel 
-    unitTests: {
-      test('Test')
-    }, 
-    integrationTests: {
-      test('IntegrationTest')
-    },
-    failFast: false
+
+  stage('test') {
+      parallel 
+      unitTests: {
+        test('Test')
+      }, 
+      integrationTests: {
+        test('IntegrationTest')
+      },
+      failFast: false
+  }
+
+  stage('publish') {
+    parallel windows: {
+      publish('win10-x64', 'windows')
+    }, centos: {
+      publish('centos.7-x64', 'centos')
+    }, ubuntu: {
+      publish('ubuntu.16.04-x64', 'ubuntu')
+    }
+  }
 }
 
 def test(type) {
@@ -32,15 +43,6 @@ def test(type) {
   }
 }
 
-stage('publish') {
-  parallel windows: {
-    publish('win10-x64', 'windows')
-  }, centos: {
-    publish('centos.7-x64', 'centos')
-  }, ubuntu: {
-    publish('ubuntu.16.04-x64', 'ubuntu')
-  }
-}
 
 def publish(target, imageLabel) {
   node {
