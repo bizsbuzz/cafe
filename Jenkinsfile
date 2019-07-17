@@ -12,11 +12,9 @@ node('dotnet') {
 
 
   stage('test') {
-      parallel 
-      unitTests: {
+      parallel unitTests: {
         test('Test')
-      }, 
-      integrationTests: {
+      }, integrationTests: {
         test('IntegrationTest')
       },
       failFast: false
